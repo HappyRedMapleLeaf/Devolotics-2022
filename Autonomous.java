@@ -11,10 +11,10 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 public class vroom extends LinearOpMode
 {
-    DcMotor driveL;
-    DcMotor driveR;
-    DcMotor duck;
-    DcMotor arm;
+    DcMotor leftDrive;
+    DcMotor rightDrive;
+    DcMotor duckMotor;
+    DcMotor armMotor;
     DcMotor intake;
     
     // do i need to make this public? java is weird idk
@@ -22,16 +22,16 @@ public class vroom extends LinearOpMode
     // basically just accurate movement, but still requires the wheels to be attached properly, NENGJIA!!! (sry)
     void driveToTarget(int targetL, int targetR, int powerL, int powerR) {
         // set targets for motors
-        driveL.setTargetPosition(driveL.getCurrentPosition() + targetL);
-        driveR.setTargetPosition(driveR.getCurrentPosition() + targetR);
+        leftDrive.setTargetPosition(driveL.getCurrentPosition() + targetL);
+        rightDrive.setTargetPosition(driveR.getCurrentPosition() + targetR);
         
         // tell motors that they're supposed to go to the target
-        driveL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        driveR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        leftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         
         // set power of motors. this is when they actually start to move
-        driveL.setPower(powerL);
-        driveR.setPower(powerR);
+        leftDrive.setPower(powerL);
+        rightDrive.setPower(powerR);
         
         // do telemetry stuff and also wait while the motors are turning
         while (opModeIsActive() && (motorL.isBusy() || motorR.isBusy))
@@ -43,8 +43,8 @@ public class vroom extends LinearOpMode
         }
         
         // stops the motor, idk if this is necessary, idk what it does, it might even break and make both motors move the same amount of time...
-        driveL.setPower(0.0);
-        driveR.setPower(0.0);
+        leftDrive.setPower(0.0);
+        rightDrive.setPower(0.0);
         // if it does break, this step would have to be done in the while loop (ez fix)
     }
     
