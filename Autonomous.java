@@ -51,10 +51,11 @@ public class vroom extends LinearOpMode
     @Override
     public void runOpMode() throws InterruptedException
     {
-        driveL = hardwareMap.dcMotor.get("driveL");
-        driveR = hardwareMap.dcMotor.get("driveR");
-        duck = hardwareMap.dcMotor.get("duck");
-        arm = hardwareMap.dcMotor.get("arm");
+        leftDrive = hardwareMap.dcMotor.get("leftDrive");
+        rightDrive = hardwareMap.dcMotor.get("rightDrive");
+        duckMotor = hardwareMap.dcMotor.get("duckMotor");
+        armMotor = hardwareMap.dcMotor.get("armMotor");
+        //Don't have assignment for this yet
         intake = hardwareMap.dcMotor.get("intake");
         
         // AYO DO I NEED TO setZeroPowerBehavior????
@@ -64,8 +65,8 @@ public class vroom extends LinearOpMode
         //driveR.setDirection(DcMotor.Direction.REVERSE);
 
         // reset encoders
-        driveL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        driveR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         
         // start sequence
         telemetry.addData("Status", "Waiting for start");
@@ -78,9 +79,9 @@ public class vroom extends LinearOpMode
         driveToTarget(5000, 5000, 0.8, 0.8) //forwards to carousel (completely arbitrary numbers btw)
         
         // carousel
-        duck.setPower(1.0)
+        duckMotor.setPower(1.0)
         sleep(3000)
-        duck.setPower(0.0)
+        duckMotor.setPower(0.0)
         
         driveToTarget(-10000, -10000, 1.0, 1.0) //backwards to around the middle
         
@@ -89,23 +90,23 @@ public class vroom extends LinearOpMode
         driveToTarget(5000, 5000, 0.7, 0.7) //go towards hub
         
         // lift arm (i know, it could be done at the same time with driving, but a) lazy, and b) we have extra time for sure)
-        arm.setPower(1.0)
+        armMotor.setPower(1.0)
         sleep(500)
-        arm.setPower(0.0) //this should brake the arm...
+        armMotor.setPower(0.0) //this should brake the arm...
         
         driveToTarget(800, 800, 0.2, 0.2) //go towards hub even more
         
         // drop preload box
         intake.setPower(-1.0)
         sleep(300)
-        arm.setPower(0.0)
+        armMotor.setPower(0.0)
         
         driveToTarget(-800, -800, 0.2, 0.2) //away from hub
         
         // drop arm
-        arm.setPower(-1.0)
+        armMotor.setPower(-1.0)
         sleep(500)
-        arm.setPower(0.0)
+        armMotor.setPower(0.0)
         
         driveToTarget(-5100, -5100, 1.0, 1.0) //go to wall, then a bit more to square with wall
         
