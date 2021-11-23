@@ -1,4 +1,3 @@
-// variables for each movement?
 // helpful: https://stemrobotics.cs.pdx.edu/node/4746
 
 package org.firstinspires.ftc.teamcode;
@@ -9,18 +8,11 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 @Autonomous(name="Autonomous")
 
-public class vroom extends LinearOpMode
+public class Pebis extends LinearOpMode
 {
-    DcMotor leftDrive;
-    DcMotor rightDrive;
-    DcMotor duckMotor;
-    DcMotor armMotor;
-    DcMotor intake;
-    
-    // do i need to make this public? java is weird idk
     // moves drive motors the specified number of ticks and does telemetry stuff
-    // basically just accurate movement, but still requires the wheels to be attached properly, NENGJIA!!! (sry)
-    void driveToTarget(int targetL, int targetR, int powerL, int powerR) {
+    // one rotations is 1440 ticks i think
+    public void driveToTarget(int targetL, int targetR, double powerL, double powerR) {
         // set targets for motors
         leftDrive.setTargetPosition(driveL.getCurrentPosition() + targetL);
         rightDrive.setTargetPosition(driveR.getCurrentPosition() + targetR);
@@ -34,10 +26,10 @@ public class vroom extends LinearOpMode
         rightDrive.setPower(powerR);
         
         // do telemetry stuff and also wait while the motors are turning
-        while (opModeIsActive() && (motorL.isBusy() || motorR.isBusy))
+        while (opModeIsActive() && (leftDrive.isBusy() || rightDrive.isBusy))
         {
-            telemetry.addData("driveL position:", driveL.getCurrentPosition() + "  isBusy=" + driveL.isBusy());
-            telemetry.addData("driveR position:", driveR.getCurrentPosition() + "  isBusy=" + driveR.isBusy());
+            telemetry.addData("driveL position:", leftDrive.getCurrentPosition() + "  isBusy=" + leftDrive.isBusy());
+            telemetry.addData("driveR position:", rightDrive.getCurrentPosition() + "  isBusy=" + rightDrive.isBusy());
             telemetry.update();
             idle();
         }
@@ -56,7 +48,7 @@ public class vroom extends LinearOpMode
         duckMotor = hardwareMap.dcMotor.get("duckMotor");
         armMotor = hardwareMap.dcMotor.get("armMotor");
         //Don't have assignment for this yet
-        intake = hardwareMap.dcMotor.get("intake");
+        intakeMotor = hardwareMap.dcMotor.get("intake");
         
         // AYO DO I NEED TO setZeroPowerBehavior????
 
@@ -76,42 +68,42 @@ public class vroom extends LinearOpMode
         telemetry.update();
         
         // actual program
-        driveToTarget(5000, 5000, 0.8, 0.8) //forwards to carousel (completely arbitrary numbers btw)
+        driveToTarget(1900, 1900, 0.7, 0.7); //forwards to carousel
         
         // carousel
-        duckMotor.setPower(1.0)
-        sleep(3000)
-        duckMotor.setPower(0.0)
+        duckMotor.setPower(1.0);
+        sleep(3000);
+        duckMotor.setPower(0.0);
         
-        driveToTarget(-10000, -10000, 1.0, 1.0) //backwards to around the middle
+        driveToTarget(-10000, -10000, 1.0, 1.0); //backwards to around the middle
         
-        driveToTarget(0, -2000, 0.0, 0.5) //turn towards hub
+        driveToTarget(1440, -1440, 0.5, 0.5); //turn towards hub
         
-        driveToTarget(5000, 5000, 0.7, 0.7) //go towards hub
+        driveToTarget(1440, 1440, 0.7, 0.7); //go towards hub
         
         // lift arm (i know, it could be done at the same time with driving, but a) lazy, and b) we have extra time for sure)
-        armMotor.setPower(1.0)
-        sleep(500)
-        armMotor.setPower(0.0) //this should brake the arm...
+        armMotor.setPower(1.0);
+        sleep(500);
+        armMotor.setPower(0.0); //this should brake the arm...
         
-        driveToTarget(800, 800, 0.2, 0.2) //go towards hub even more
+        driveToTarget(400, 400, 0.2, 0.2); //go towards hub even more
         
         // drop preload box
-        intake.setPower(-1.0)
-        sleep(300)
-        armMotor.setPower(0.0)
+        intakeMotor.setPower(-1.0);
+        sleep(600);
+        armMotor.setPower(0.0);
         
-        driveToTarget(-800, -800, 0.2, 0.2) //away from hub
+        driveToTarget(-400, -400, 0.2, 0.2); //away from hub
         
         // drop arm
-        armMotor.setPower(-1.0)
-        sleep(500)
-        armMotor.setPower(0.0)
+        armMotor.setPower(-1.0);
+        sleep(400);
+        armMotor.setPower(0.0);
         
-        driveToTarget(-5100, -5100, 1.0, 1.0) //go to wall, then a bit more to square with wall
+        driveToTarget(-2900, -2900, 1.0, 1.0); //go to wall, then a bit more to square with wall
         
-        driveToTarget(2000, 0, 0.5, 0.0) //turn towards warehouse
+        driveToTarget(2900, -50, 0.5, 0.1); //turn towards warehouse
         
-        driveToTarget(5000, 5000, 0.8, 0.8) //go into warehouse hopefully
+        driveToTarget(6500, 6500, 0.8, 0.8); //go into warehouse
     }
 }
