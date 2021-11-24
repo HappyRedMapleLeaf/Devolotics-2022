@@ -1,32 +1,3 @@
-/* Copyright (c) 2017 FIRST. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted (subject to the limitations in the disclaimer below) provided that
- * the following conditions are met:
- *
- * Redistributions of source code must retain the above copyright notice, this list
- * of conditions and the following disclaimer.
- *
- * Redistributions in binary form must reproduce the above copyright notice, this
- * list of conditions and the following disclaimer in the documentation and/or
- * other materials provided with the distribution.
- *
- * Neither the name of FIRST nor the names of its contributors may be used to endorse or
- * promote products derived from this software without specific prior written permission.
- *
- * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS
- * LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -35,38 +6,15 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.Range;
 
-/**
- * This OpMode uses the common Pushbot hardware class to define the devices on the robot.
- * All device access is managed through the HardwarePushbot class.
- * The code is structured as a LinearOpMode
- *
- * This particular OpMode executes a POV Game style Teleop for a PushBot
- * In this mode the left stick moves the robot FWD and back, the Right stick turns left and right.
- * It raises and lowers the claw using the Gampad Y and A buttons respectively.
- * It also opens and closes the claws slowly using the left and right Bumper buttons.
- *
- * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
- * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
- */
-
 @TeleOp(name="Pushbot: Teleop POV", group="Pushbot")
 
 public class PushBotinear extends LinearOpMode {
 
-    /* Declare OpMode members. */
-    HardwarePushbot robot           = new HardwarePushbot();   // Use a Pushbot's hardware
-    double          clawOffset      = 0;                       // Servo mid position
-    final double    CLAW_SPEED      = 0.02 ;               
-    // sets rate to move servo
+    HardwarePushbot robot = new HardwarePushbot();   // Use a Pushbot's hardware
 
     @Override
     public void runOpMode() {
-        double left;
-        double right;
-        double drive;
-        double turn;
-        double max;
-        double ArmTarget;
+		double intakeStopRuntime = 0; //runtime when intake should stop moving
 
         /* Initialize the hardware variables.
          * The init() method of the hardware class does all the work here
@@ -74,59 +22,110 @@ public class PushBotinear extends LinearOpMode {
         robot.init(hardwareMap);
 
         // Send telemetry message to signify robot waiting;
-        telemetry.addData("Say", "Hello Driver");    //
+        telemetry.addData("Say", "Hello Driver");
         telemetry.update();
         
-
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         
+        leftDrive.setDirection(DcMotor.Direction.REVERSE); // reversing left motor because robot dumdum
+        robot.armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
+			
+            // apparently bay wants some weird controls but he asked for it so.....
+			// left controls all movement, right controls turning only
+			
+			if Math.abs(gamepad1.right_stick_x) > 0.05 { //right stick is touched (some tolerance is given)
+				
+				// only turn
+				//one wheel, other wheel is stationary
+				//robot.leftDrive.setPower(Math.max(gamepad1.right_stick_x, 0));
+				//robot.rightDrive.setPower(Math.max(-gamepad1.right_stick_x, 0));
+				
+				//both wheels
+				robot.leftDrive.setPower(gamepad1.right_stick_x);
+				robot.rightDrive.setPower(-gamepad1.right_stick_x);
+				
+			} else { //right stick is untouched
+				
+				if Math.abs(gamepad1.left_stick_x) > 0.1 { //left stick is moved left/right past a certain amount,
+														   //stop all movement and turn cuz that's what bay wants
+					//one wheel, other wheel is stationary
+					//robot.leftDrive.setPower(Math.max(gamepad1.right_stick_x, 0));
+					//robot.rightDrive.setPower(Math.max(-gamepad1.right_stick_x, 0));
 
-            // Run wheels in POV mode (note: The joystick goes negative when pushed forwards, so negate it)
-            // In this mode the Left stick moves the robot fwd and back, the Right stick turns left and right.
-            // This way it's also easy to just drive straight, or just turn.
-            drive = -gamepad1.left_stick_y;
-            turn  =  gamepad1.right_stick_x;
-            // Combine drive and turn for blended motion.
-            left  = drive - turn;
-            right = drive + turn;
+					//both wheels
+					robot.leftDrive.setPower(gamepad1.right_stick_x);
+					robot.rightDrive.setPower(-gamepad1.right_stick_x);
+				} else {
+					robot.leftDrive.setPower(-gamepad1.right_stick_y);
+					robot.rightDrive.setPower(-gamepad1.right_stick_y);
+				}
+				
+				/*
+				//if bay actually doesn't want left stick sideways movement to stop other movement, then uncomment the code below
+				double drive = -gamepad1.left_stick_y;
+				double turn  =  gamepad1.left_stick_x;
+				// Combine drive and turn for blended motion.
+				double left  = drive - turn;
+				double right = drive + turn;
 
-            // Normalize the values so neither exceed +/- 1.0
-            max = Math.max(Math.abs(left), Math.abs(right));
-            if (max > 1.0)
-            {
-                left /= max;
-                right /= max;
-            }
-            robot.armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            if (gamepad1.y)
-                robot.armMotor.setPower(0.2); //0.2
-            else if (gamepad1.a)
-                robot.armMotor.setPower(-0.2);
-                //-367
-            else
-                robot.armMotor.setPower(0.0);
-            
-            if (gamepad1.right_bumper)
-                robot.duckMotor.setPower(1);
-            else if (gamepad1.left_bumper)
-                robot.duckMotor.setPower(-1);
-            else
-                robot.duckMotor.setPower(0.0);
-            // Output the safe vales to the motor drives.
-            robot.leftDrive.setPower(left);
-            robot.rightDrive.setPower(right);
+				// Normalize the values so neither exceed +/- 1.0
+				left = Math.min(left, 1.0);
+				left = Math.max(left, -1.0);
+				right = Math.min(right, 1.0);
+				right = Math.max(right, -1.0);
 
-           
+				robot.leftDrive.setPower(left);
+				robot.rightDrive.setPower(right);
+				*/
+			}
+			
+			// duck stuff, commented out because otherwise dumb errors might pop up and make bay go to the washroom
+			/*
+			if gamepad1.dpad_up || gamepad1.dpad_left {
+				robot.duckMotor.setPower(-1.0);
+			} else if gamepad1.dpad_down || gamepad1.dpad_right {
+				robot.duckMotor.setPower(1.0);
+			} else {
+				robot.duckMotor.setPower(0.0);
+			}
+			*/
+			
+			//intake motor
+			if getRuntime() <= intakeStopRuntime { //if no preset is running
+				intakeMotor.setPower(0.0);
+				
+				if gamepad1.a { //intake in for 1s
+					intakeStopRuntime = getRuntime() + 1;
+					intakeMotor.setPower(1.0);
+				}
+				if gamepad1.b { //intake out for 1s
+					intakeStopRuntime = getRuntime() + 1;
+					intakeMotor.setPower(-1.0);
+				}
+				
+				//manual intake control, only works if preset is done
+				robot.intakeMotor.setPower(gamepad1.left_trigger - gamepad1.right_trigger); //idk the directions, left is out, right is in
+			}
+			
+			//arm manual movement
+			if gamepad1.left_bumper { //idk the directions for this either
+				robot.armMotor.setPower(0.7);
+			else if gamepad1.right_bumper {
+				robot.armMotor.setPower(-0.7);
+			} else {
+				//lock in place
+				robot.armMotor.setPower(0.0);
+			}
+			
             // Send telemetry message to show armMotor;
-            telemetry.addData("Say", robot.armMotor.getCurrentPosition());    //
+            telemetry.addData("Say", robot.armMotor.getCurrentPosition());
             telemetry.update();
-      
-            // Pace this loop so jaw action is reasonable speed.
-            sleep(50);
+			
+			//there was a delay here before but i think its useless lol
         }
     }
 }
