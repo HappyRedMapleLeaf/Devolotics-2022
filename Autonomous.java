@@ -24,7 +24,7 @@ public class Pebis extends LinearOpMode {
     private ElapsedTime     runtime = new ElapsedTime();
 
     // moves drive motors the specified number of ticks and does telemetry stuff
-    // one rotation is 1440 ticks i think
+    // one rotation is 1440 ticks
     public void driveToTarget(int targetL, int targetR, double powerL, double powerR) {
         // set targets for motors
         leftDrive.setTargetPosition(leftDrive.getCurrentPosition() + targetL);
@@ -73,6 +73,7 @@ public class Pebis extends LinearOpMode {
         // reset encoders
         leftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        
         armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
