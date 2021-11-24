@@ -15,10 +15,13 @@ public class PushBotinear extends LinearOpMode {
     @Override
     public void runOpMode() {
 		double intakeStopRuntime = 0; //runtime when intake should stop moving
+		int armTarget = -1000; //0 is on ground, positive is higher. -1000 means no target.
+		int armMin = 0; //arm must be on ground before 
+		int armMax = 1000; //tbd
+		int armFreezeTarget = 0; //where the arm wants to stay stationary
 
         /* Initialize the hardware variables.
-         * The init() method of the hardware class does all the work here
-         */
+           The init() method of the hardware class does all the work here */
         robot.init(hardwareMap);
 
         // Send telemetry message to signify robot waiting;
@@ -30,6 +33,9 @@ public class PushBotinear extends LinearOpMode {
         
         leftDrive.setDirection(DcMotor.Direction.REVERSE); // reversing left motor because robot dumdum
         robot.armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+		
+        leftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
@@ -111,19 +117,77 @@ public class PushBotinear extends LinearOpMode {
 				robot.intakeMotor.setPower(gamepad1.left_trigger - gamepad1.right_trigger); //idk the directions, left is out, right is in
 			}
 			
+			//arm stuff, manual movement overrides preset
+			double armTargetPower = 0;
+			int armPosition = robot.armMotor.getCurrentPosition() //reduces clutter
+			
 			//arm manual movement
-			if gamepad1.left_bumper { //idk the directions for this either
-				robot.armMotor.setPower(0.7);
+			if gamepad1.left_bumper { //arm manual movement
+				//down
+				armTargetPower = -0.5;
+				armFreezeTarget = -1000;
+				armTarget = -1000;
 			else if gamepad1.right_bumper {
-				robot.armMotor.setPower(-0.7);
+				//up
+				armTargetPower = 0.5;
+				armFreezeTarget = -1000;
+				armTarget = -1000;
 			} else {
-				//lock in place
-				robot.armMotor.setPower(0.0);
+				if gamepad1.x {
+					armTarget = 300; //tbd
+				}
+				if gamepad1.y {
+					armTarget = 600; //tbd
+				}
+				if armPosition > armTarget + 10 { //arm too high, giving some tolerance
+					armTargetPower = -0.5;
+					armFreezeTarget = -1000;
+				} else if armPosition < armTarget - 10 { //arm too low
+					armTargetPower = 0.5; //arm on target
+					armFreezeTarget = -1000;
+				} else {
+					armTargetPower = 0;
+					//kinda complex: armfreezetarget is only set for the first time that targetpower is 0
+					//this is done by setting freezetarget to -1000 whenever a non-zero target power is set
+					if armFreezeTarget == -1000 {
+						armFreezeTarget = armPosition;
+					}
+				}
 			}
 			
-            // Send telemetry message to show armMotor;
-            telemetry.addData("Say", robot.armMotor.getCurrentPosition());
-            telemetry.update();
+			//keeping arm stable
+				
+			if armPosition >= armMax {
+				//if too high, let it drop. if too low, raise it back
+				//use armmax as "freeze target"
+				if armPosition >= armMax {
+					robot.armMotor.setPower(0);
+				} else if armPosition < armMax {
+					robot.armMotor.setPower(0.1);
+				}
+			} else if armPosition <= armMin {
+				//stop the motor. the arm is on the ground.
+				robot.armMotor.setPower(0);
+					
+			} else if armTargetPower == 0 {
+				//if too high, push it down. if too low, raise it back
+				//use freezetarget
+				if armPosition > armFreezeTarget {
+					robot.armMotor.setPower(-0.05);
+				} else if armPosition < armFreezeTarget {
+					robot.armMotor.setPower(0.1);
+				} else {
+					//still apply some force to counter gravity
+					robot.armMotor.setPower(0.05);
+				}
+					
+			} else {
+				robot.armMotor.setPower(armTargetPower); //if none of the weird conditions are true, set the power
+			}
+			
+			// Send telemetry message to show armMotor;
+			telemetry.addData("Say", robot.armMotor.getCurrentPosition());
+			telemetry.update();
 			
 			//there was a delay here before but i think its useless lol
         }
