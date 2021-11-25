@@ -1,143 +1,128 @@
+// helpful: https://stemrobotics.cs.pdx.edu/node/4746
+
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.util.Range;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp(name="Pushbot: Teleop- BAY MODE ", group="Pushbot")
+@Autonomous(name="Pebis", group="Pushbot")
 
-public class NewTeleOp extends LinearOpMode {
+public class Pebis extends LinearOpMode {
+    
+    /* Public OpMode members. */
+    public DcMotor leftDrive;
+    public DcMotor rightDrive;
+    public DcMotor armMotor;
+    public DcMotor intakeMotor;
+    //public DcMotor duckMotor;
 
-    HardwarePushbot robot = new HardwarePushbot();   // Use a Pushbot's hardware
+    /* Declare OpMode members. */
+    HardwarePushbot         robot   = new HardwarePushbot();   // Use a Pushbot's hardware
+    private ElapsedTime     runtime = new ElapsedTime();
 
+    // moves drive motors the specified number of ticks and does telemetry stuff
+    // one rotation is 1440 ticks
+    public void driveToTarget(int targetL, int targetR, double powerL, double powerR) {
+        // set targets for motors
+        leftDrive.setTargetPosition(leftDrive.getCurrentPosition() + targetL);
+        rightDrive.setTargetPosition(rightDrive.getCurrentPosition() + targetR);
+        
+        // tell motors that they're supposed to go to the target
+        leftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        
+        // set power of motors. this is when they actually start to move
+        leftDrive.setPower(Math.abs(powerL));
+        rightDrive.setPower(Math.abs(powerR));
+        
+        // do telemetry stuff and also wait while the motors are turning
+        while (opModeIsActive() && (leftDrive.isBusy() || rightDrive.isBusy()))
+        {
+            telemetry.addData("Target",  "Running to %7d :%7d", (leftDrive.getCurrentPosition() + targetL),  (rightDrive.getCurrentPosition() + targetR));
+            telemetry.addData("Position",  "Running at %7d :%7d",
+                                        leftDrive.getCurrentPosition(),
+                                        rightDrive.getCurrentPosition());
+            telemetry.update();
+            idle();
+        }
+        
+        // stops the motor, idk if this is necessary, idk what it does, it might even break and make both motors move the same amount of time...
+        leftDrive.setPower(0.0);
+        rightDrive.setPower(0.0);
+        
+
+        // Turn off RUN_TO_POSITION
+        leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+    
     @Override
-    public void runOpMode() {
-        int armMin = 20; //0
-        int armMax = 440; //456
-        int armFreezeTarget = 0; //where the arm wants to stay stationary
+    public void runOpMode() throws InterruptedException
+    {
+        leftDrive = hardwareMap.dcMotor.get("leftDrive");
+        rightDrive = hardwareMap.dcMotor.get("rightDrive");
+        //duckMotor = hardwareMap.dcMotor.get("duckMotor");
+        armMotor = hardwareMap.dcMotor.get("armMotor");
+        intakeMotor = hardwareMap.dcMotor.get("intake");
 
-        /* Initialize the hardware variables.
-           The init() method of the hardware class does all the work here */
-        robot.init(hardwareMap);
+        leftDrive.setDirection(DcMotor.Direction.REVERSE);
 
-        // Send telemetry message to signify robot waiting;
-        telemetry.addData("Say", "Hello Bay the Gamer");
+        // reset encoders
+        leftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        
+        armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        // start sequence
+        telemetry.addData("Status", "Waiting for start");
+        telemetry.update();
+        waitForStart();
+        telemetry.addData("Status", "Running");
         telemetry.update();
         
-        // Wait for the game to start (driver presses PLAY)
-        waitForStart();
+        // actual program. Intial position: halfway between first and second ground tile
+        driveToTarget(1800, 1600, 0.7, 0.6); //forwards to carousel, turn a bit because duck wheel will hit the metal thingy
         
+        // carousel
+        //duckMotor.setPower(1.0);
+        sleep(3000);
+        //duckMotor.setPower(0.0);
         
-        //robot.leftDrive.setDirection(DcMotor.Direction.REVERSE); // reversing left motor because robot dumdum
-        robot.armMotor.setDirection(DcMotor.Direction.REVERSE);
-        robot.armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        driveToTarget(-1800, -1600, 0.7, 0.6); //back to initial position
         
-        robot.leftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.rightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        driveToTarget(-3000, -3000, 1.0, 1.0); //backwards to around the middle
         
-        robot.leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
-        robot.rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
+        driveToTarget(1500, -1500, 0.5, 0.5); //turn towards hub
         
-
-        // run until the end of the match (driver presses STOP)
-        while (opModeIsActive()) {
-            
-            // apparently bay wants some weird controls but he asked for it so.....
-            // left controls all movement, right controls turning only
-            
-            if (Math.abs(gamepad1.right_stick_x) > 0.05) { //right stick is touched (some tolerance is given)
-                
-                // only turn
-                //one wheel, other wheel is stationary
-                //robot.leftDrive.setPower(Math.max(gamepad1.right_stick_x, 0));
-                //robot.rightDrive.setPower(Math.max(-gamepad1.right_stick_x, 0));
-                
-                //both wheels
-                robot.leftDrive.setPower(-gamepad1.right_stick_x);
-                robot.rightDrive.setPower(gamepad1.right_stick_x);
-                
-            } else { //right stick is untouched
-                
-                //if bay actually doesn't want left stick sideways movement to stop other movement, then uncomment the code below
-                double drive = gamepad1.left_stick_y;
-                double turn  = gamepad1.left_stick_x;
-                // Combine drive and turn for blended motion.
-                double left  = drive - turn;
-                double right = drive + turn;
-
-                // Normalize the values so neither exceed +/- 1.0
-                left = Math.min(left, 1.0);
-                left = Math.max(left, -1.0);
-                right = Math.min(right, 1.0);
-                right = Math.max(right, -1.0);
-
-                robot.leftDrive.setPower(left);
-                robot.rightDrive.setPower(right);
-                
-            }
-            
-            //intake motor
-            robot.intakeMotor.setPower(gamepad1.right_trigger - gamepad1.left_trigger); //left is out, right is in
-            
-            
-            //arm stuff
-            int armPosition = robot.armMotor.getCurrentPosition(); //reduces clutter
-            double armTargetPower = 0;
-            
-            if (gamepad1.left_bumper) { //arm manual movement
-                //down
-                armTargetPower = -0.3;
-                armFreezeTarget = -1000;
-            } else if (gamepad1.right_bumper) {
-                //up
-                armTargetPower = 0.3;
-                armFreezeTarget = -1000;
-            } else {
-                armTargetPower = 0;
-            }
-            
-            if (armTargetPower > 0) { //trying to move up
-                if (armPosition > armMax) {
-                    armTargetPower = 0; //stop
-                } else if (armPosition > armMax - 100) {
-                    armTargetPower = 0.2; //slow down
-                }
-            } else if (armTargetPower < 0) { //trying to move down
-                if (armPosition < armMin + 100) {
-                    armTargetPower = 0; //slow down (really just stopping it)
-                }
-            } else {
-                //kinda complex: armfreezetarget is only set for the first time that targetpower is 0
-                //this is done by setting freezetarget to -1000 whenever a non-zero target power is set
-                if (armFreezeTarget == -1000) {
-                    armFreezeTarget = armPosition;
-                }
-            }
-            
-            if (gamepad1.a) {
-                armFreezeTarget = 180; //tbd
-            }
-            if (gamepad1.x) {
-                armFreezeTarget = 290; //tbd
-            }
-            
-            if (armFreezeTarget != -1000) {
-                if (armPosition > armFreezeTarget) {
-                    robot.armMotor.setPower(0);
-                } else if (armPosition < armFreezeTarget) {
-                    robot.armMotor.setPower(0.12);
-                }
-            } else {
-                robot.armMotor.setPower(armTargetPower);
-            }
-            
-            // Send telemetry message to show armMotor;
-            telemetry.addData("armPosition", armPosition);
-            telemetry.addData("freezeTarget", armFreezeTarget);
-            
-            telemetry.update();
-        }
+        driveToTarget(1440, 1440, 0.7, 0.7); //go towards hub
+        
+        // lift arm (i know, it could be done at the same time with driving, but a) lazy, and b) we have extra time for sure)
+        armMotor.setPower(0.5);
+        sleep(500);
+        armMotor.setPower(0.1); //too lazy to do encoder stuff, so im just gonna uhm... apply a little power and hope it keeps it up lol
+        
+        driveToTarget(400, 400, 0.2, 0.2); //go towards hub even more
+        
+        // drop preload box
+        intakeMotor.setPower(-1.0);
+        sleep(600);
+        intakeMotor.setPower(0.0);
+        
+        driveToTarget(-400, -400, 0.2, 0.2); //away from hub
+        
+        // drop arm
+        armMotor.setPower(-1.0);
+        sleep(400);
+        armMotor.setPower(0.0);
+        
+        driveToTarget(-2800, -2800, 1.0, 1.0); //go to wall, then a bit more to square with wall
+        
+        driveToTarget(2900, -50, 0.5, 0.1); //turn towards warehouse
+        
+        driveToTarget(6600, 6500, 0.81, 0.8); //go into warehouse
     }
 }
