@@ -1,5 +1,3 @@
-// helpful: https://stemrobotics.cs.pdx.edu/node/4746
-
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -8,20 +6,15 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@Autonomous(name="Pebis", group="Pushbot")
+@Autonomous(name="Autonomous", group="Devolotics")
 
-public class Pebis extends LinearOpMode {
+public class auton extends LinearOpMode {
     
-    /* Public OpMode members. */
     public DcMotor leftDrive;
     public DcMotor rightDrive;
     public DcMotor armMotor;
     public DcMotor intakeMotor;
     //public DcMotor duckMotor;
-
-    /* Declare OpMode members. */
-    HardwarePushbot         robot   = new HardwarePushbot();   // Use a Pushbot's hardware
-    private ElapsedTime     runtime = new ElapsedTime();
 
     // moves drive motors the specified number of ticks and does telemetry stuff
     // one rotation is 1440 ticks
@@ -49,11 +42,10 @@ public class Pebis extends LinearOpMode {
             idle();
         }
         
-        // stops the motor, idk if this is necessary, idk what it does, it might even break and make both motors move the same amount of time...
+        // stops the motor
         leftDrive.setPower(0.0);
         rightDrive.setPower(0.0);
         
-
         // Turn off RUN_TO_POSITION
         leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -64,65 +56,28 @@ public class Pebis extends LinearOpMode {
     {
         leftDrive = hardwareMap.dcMotor.get("leftDrive");
         rightDrive = hardwareMap.dcMotor.get("rightDrive");
-        //duckMotor = hardwareMap.dcMotor.get("duckMotor");
         armMotor = hardwareMap.dcMotor.get("armMotor");
         intakeMotor = hardwareMap.dcMotor.get("intake");
-
+        //duckMotor = hardwareMap.dcMotor.get("duckMotor");
+        
+        //motor settings
         leftDrive.setDirection(DcMotor.Direction.REVERSE);
-
-        // reset encoders
         leftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        
         armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        
         // start sequence
-        telemetry.addData("Status", "Waiting for start");
+        telemetry.addData("Status:", "Waiting for start");
         telemetry.update();
         waitForStart();
         telemetry.addData("Status", "Running");
         telemetry.update();
         
-        // actual program. Intial position: halfway between first and second ground tile
-        driveToTarget(1800, 1600, 0.7, 0.6); //forwards to carousel, turn a bit because duck wheel will hit the metal thingy
-        
-        // carousel
-        //duckMotor.setPower(1.0);
-        sleep(3000);
-        //duckMotor.setPower(0.0);
-        
-        driveToTarget(-1800, -1600, 0.7, 0.6); //back to initial position
-        
-        driveToTarget(-3000, -3000, 1.0, 1.0); //backwards to around the middle
-        
-        driveToTarget(1500, -1500, 0.5, 0.5); //turn towards hub
-        
-        driveToTarget(1440, 1440, 0.7, 0.7); //go towards hub
-        
-        // lift arm (i know, it could be done at the same time with driving, but a) lazy, and b) we have extra time for sure)
-        armMotor.setPower(0.5);
-        sleep(500);
-        armMotor.setPower(0.1); //too lazy to do encoder stuff, so im just gonna uhm... apply a little power and hope it keeps it up lol
-        
-        driveToTarget(400, 400, 0.2, 0.2); //go towards hub even more
-        
-        // drop preload box
-        intakeMotor.setPower(-1.0);
-        sleep(600);
-        intakeMotor.setPower(0.0);
-        
-        driveToTarget(-400, -400, 0.2, 0.2); //away from hub
-        
-        // drop arm
-        armMotor.setPower(-1.0);
-        sleep(400);
-        armMotor.setPower(0.0);
-        
-        driveToTarget(-2800, -2800, 1.0, 1.0); //go to wall, then a bit more to square with wall
-        
-        driveToTarget(2900, -50, 0.5, 0.1); //turn towards warehouse
-        
-        driveToTarget(6600, 6500, 0.81, 0.8); //go into warehouse
+        //copy back from the version at school lol
+        //after turn towards hub:
+        driveToTarget(-720, -720, 0.7, 0.7); //go backwards and square
+        //go towards hub needs to be around 720 more
     }
 }
