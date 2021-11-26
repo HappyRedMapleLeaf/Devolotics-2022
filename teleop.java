@@ -77,16 +77,12 @@ public class teleop extends LinearOpMode {
             //intake motor
             intakeMotor.setPower(gamepad1.right_trigger - gamepad1.left_trigger); //left is out, right is in
             
-			/*
-            //duck motor
-			if gamepad1.dpad_up || gamepad1.dpad_left {
-				duckMotor.setPower(-1.0);
-			} else if gamepad1.dpad_down || gamepad1.dpad_right {
-				duckMotor.setPower(1.0);
+            //duck motor, only need one direction
+			if (gamepad1.dpad_up || gamepad1.dpad_left || gamepad1.dpad_down || gamepad1.dpad_right) {
+				duckMotor.setPower(-0.7);
 			} else {
 				duckMotor.setPower(0.0);
 			}
-			*/
             
             //arm movement
             int armPosition = armMotor.getCurrentPosition();
