@@ -80,9 +80,9 @@ public class auton extends LinearOpMode {
         driveToTarget(1100, 800, 1.0, 0.4); //forwards to carousel, turn a bit because duck wheel will hit the metal thingy
         
         // carousel
-        //duckMotor.setPower(0.4);
+        duckMotor.setPower(-0.7);
         sleep(3000);
-        //duckMotor.setPower(0.0);
+        duckMotor.setPower(0.0);
         
         driveToTarget(-1100, -800, 1.0, 0.4); //back to initial position
         
