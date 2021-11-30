@@ -57,21 +57,8 @@ public class teleop extends LinearOpMode {
                 rightDrive.setPower(-gamepad1.right_stick_x);
                 
             } else { //right stick is untouched
-                
-                double drive = -gamepad1.left_stick_y;
-                double turn  = gamepad1.left_stick_x;
-                // Combine drive and turn for blended motion.
-                double left  = drive + turn;
-                double right = drive - turn;
-
-                // Normalize the values so neither exceed +/- 1.0
-                left = Math.min(left, 1.0);
-                left = Math.max(left, -1.0);
-                right = Math.min(right, 1.0);
-                right = Math.max(right, -1.0);
-
-                leftDrive.setPower(left);
-                rightDrive.setPower(right);
+                leftDrive.setPower(-gamepad1.left_stick_y);
+                rightDrive.setPower(-gamepad1.left_stick_y);
             }
             
             //intake motor
