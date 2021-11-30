@@ -80,17 +80,23 @@ public class auton extends LinearOpMode {
         driveToTarget(1100, 800, 1.0, 0.4); //forwards to carousel, turn a bit because duck wheel will hit the metal thingy
         
         // carousel
-        duckMotor.setPower(-0.7);
+        duckMotor.setPower(-0.5);
         sleep(3000);
         duckMotor.setPower(0.0);
         
         driveToTarget(-1100, -800, 1.0, 0.4); //back to initial position
         
-        driveToTarget(-3000, -3100, 1.0, 1.0); //backwards to around the middle
+        driveToTarget(-3900, -4000, 1.0, 1.0); //backwards to around the middle
         
-        driveToTarget(1700, -1700, 0.5, 0.5); //turn towards hub
+        driveToTarget(1500, -1500, 0.5, 0.5); //turn towards hub
         
-        driveToTarget(1400, 1400, 0.7, 0.7); //go towards hub
+        leftDrive.setPower(-0.5);
+        rightDrive.setPower(-0.5);
+        sleep(2000);
+        leftDrive.setPower(0);
+        rightDrive.setPower(0);
+        
+        driveToTarget(2000, 2000, 0.7, 0.7); //go towards hub
         
         // lift arm (i know, it could be done at the same time with driving, but a) lazy, and b) we have extra time for sure)
         armMotor.setPower(-0.5);
@@ -109,10 +115,10 @@ public class auton extends LinearOpMode {
         // drop arm
         armMotor.setPower(0.0);
         
-        driveToTarget(-2800, -2800, 1.0, 1.0); //go to wall, then a bit more to square with wall
+        driveToTarget(-2700, -2700, 1.0, 1.0); //go to wall, then a bit more to square with wall
         
         driveToTarget(2900, -50, 0.5, 0.1); //turn towards warehouse
         
-        driveToTarget(6500, 6400, 0.81, 0.8); //go into warehouse
+        driveToTarget(6300, 6300, 0.81, 0.8); //go into warehouse
     }
 }
