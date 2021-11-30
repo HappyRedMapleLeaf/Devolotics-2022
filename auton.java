@@ -96,7 +96,7 @@ public class auton extends LinearOpMode {
         leftDrive.setPower(0);
         rightDrive.setPower(0);
         
-        driveToTarget(2000, 2000, 0.7, 0.7); //go towards hub
+        driveToTarget(1800, 1800, 0.7, 0.7); //go towards hub
         
         // lift arm (i know, it could be done at the same time with driving, but a) lazy, and b) we have extra time for sure)
         armMotor.setPower(-0.5);
