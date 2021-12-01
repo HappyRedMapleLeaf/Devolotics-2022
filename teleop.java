@@ -77,30 +77,23 @@ public class teleop extends LinearOpMode {
             
             //manual movement
             if (gamepad1.left_bumper) { //down
-                armTargetPower = -0.3;
-                armFreezeTarget = -1000; //explained later
+                armTargetPower = -0.3; armFreezeTarget = -1000;
             } else if (gamepad1.right_bumper) { //up
-                armTargetPower = 0.3;
-                armFreezeTarget = -1000;
-            } else {
-                armTargetPower = 0;
-            }
+                armTargetPower = 0.3;  armFreezeTarget = -1000;
+            } else { armTargetPower = 0; }
             
-            if (armTargetPower > 0) { //trying to move up
-                if (armPosition > armMax) { //but too high
+            if (armTargetPower > 0) { //trying to move up,
+                if (armPosition > armMax) { //but arm is too high
                     armTargetPower = 0; //stop
-                } else if (armPosition > armMax - 100) { //almost too high
+                } else if (armPosition > armMax - 100) { //arm is almost too high
                     armTargetPower = 0.2; //slow down
                 }
             } else if (armTargetPower < 0) { //trying to move down
                 if (armPosition < armMin + 100) { //almost too low
-                    armTargetPower = 0; //"stopping" the motor, but really, this just drops it slowly
+                    armTargetPower = 0; //"stopping" the motor, but this really just drops it slowly
                 }
             } else {
-                //kinda complex: armFreezeTarget is only set for the *first time* that targetpower is 0
-                //this is done by setting armFreezeTarget to -1000 whenever a non-zero target power is set
-                //so if the next loop comes and sees that armFreezeTarget isn't -1000, it knows not to change it
-                //because otherwise the "target" would keep moving and be useless
+                //armFreezeTarget is where the arm wants to go/stay when stationary. -1000 means no target
                 if (armFreezeTarget == -1000) {
                     armFreezeTarget = armPosition;
                 }
