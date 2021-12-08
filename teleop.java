@@ -14,7 +14,7 @@ public class teleop extends LinearOpMode {
     public DcMotor rightDrive;
     public DcMotor armMotor;
     public DcMotor intakeMotor;
-    //public DcMotor duckMotor;
+    public DcMotor duckMotor;
 
     @Override
     public void runOpMode() {
@@ -22,10 +22,10 @@ public class teleop extends LinearOpMode {
         rightDrive = hardwareMap.dcMotor.get("rightDrive");
         armMotor = hardwareMap.dcMotor.get("armMotor");
         intakeMotor = hardwareMap.dcMotor.get("intake");
-        //duckMotor = hardwareMap.dcMotor.get("duckMotor");
+        duckMotor = hardwareMap.dcMotor.get("duckMotor");
         
         int armMin = 20; //0
-        int armMax = 440; //456
+        int armMax = 455; //456
         int armFreezeTarget = 0; //where the arm wants to stay stationary
 
         telemetry.addData("Hello", "Bay the Gamer");
@@ -62,14 +62,23 @@ public class teleop extends LinearOpMode {
             }
             
             //intake motor
-            intakeMotor.setPower(gamepad1.right_trigger - gamepad1.left_trigger); //left is out, right is in
+            if (gamepad1.left_trigger > 0){
+                intakeMotor.setPower(0.9);
+            } else if (gamepad1.right_trigger > 0){
+                intakeMotor.setPower(-0.7);
+            }
+            //intakeMotor.setPower(gamepad1.right_trigger - gamepad1.left_trigger); //left is out, right is in
+            
             
             //duck motor, only need one direction
-			if (gamepad1.dpad_up || gamepad1.dpad_left || gamepad1.dpad_down || gamepad1.dpad_right) {
-				duckMotor.setPower(-0.7);
-			} else {
-				duckMotor.setPower(0.0);
-			}
+            if ( gamepad1.dpad_left || gamepad1.dpad_right) {
+                duckMotor.setPower(-0.4);
+            } else if ( gamepad1.dpad_down || gamepad1.dpad_up ){
+                duckMotor.setPower(-1.0);
+            } else {
+                duckMotor.setPower(0.0);
+            }
+            
             
             //arm movement
             int armPosition = armMotor.getCurrentPosition();
@@ -77,23 +86,30 @@ public class teleop extends LinearOpMode {
             
             //manual movement
             if (gamepad1.left_bumper) { //down
-                armTargetPower = -0.3; armFreezeTarget = -1000;
+                armTargetPower = -0.3;
+                armFreezeTarget = -1000; //explained later
             } else if (gamepad1.right_bumper) { //up
-                armTargetPower = 0.3;  armFreezeTarget = -1000;
-            } else { armTargetPower = 0; }
+                armTargetPower = 0.3;
+                armFreezeTarget = -1000;
+            } else {
+                armTargetPower = 0;
+            }
             
-            if (armTargetPower > 0) { //trying to move up,
-                if (armPosition > armMax) { //but arm is too high
+            if (armTargetPower > 0) { //trying to move up
+                if (armPosition > armMax) { //but too high
                     armTargetPower = 0; //stop
-                } else if (armPosition > armMax - 100) { //arm is almost too high
+                } else if (armPosition > armMax - 100) { //almost too high
                     armTargetPower = 0.2; //slow down
                 }
             } else if (armTargetPower < 0) { //trying to move down
                 if (armPosition < armMin + 100) { //almost too low
-                    armTargetPower = 0; //"stopping" the motor, but this really just drops it slowly
+                    armTargetPower = 0; //"stopping" the motor, but really, this just drops it slowly
                 }
             } else {
-                //armFreezeTarget is where the arm wants to go/stay when stationary. -1000 means no target
+                //kinda complex: armFreezeTarget is only set for the *first time* that targetpower is 0
+                //this is done by setting armFreezeTarget to -1000 whenever a non-zero target power is set
+                //so if the next loop comes and sees that armFreezeTarget isn't -1000, it knows not to change it
+                //because otherwise the "target" would keep moving and be useless
                 if (armFreezeTarget == -1000) {
                     armFreezeTarget = armPosition;
                 }
