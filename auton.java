@@ -26,7 +26,7 @@
         armMotor.setPower(-0.5);
         //sleep(200); //level 1
         //sleep(450); //level 2
-        sleep(700); //level 3
+        sleep(950); //level 3
         armMotor.setPower(-0.1); //too lazy to do encoder stuff, so im just gonna uhm... apply a little power and hope it keeps it up lol
         
         driveToTarget(0.31, 0.31, 0.2, 0.2); //go towards hub even more
