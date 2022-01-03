@@ -2,7 +2,7 @@ import edu.wpi.first.wpilibj.AnalogInput;
 
 //Create the Analog Object
 public AnalogInput sharp;
-
+public DeviceMapping(java.lang.Class<DEVICE_TYPE> deviceTypeClass) //not sure what device_type is
 //Constuct a new instance
 // sharp = new AnalogInput(port); // still have to figure this out
 rangeSensor = hardwareMap.DeviceMapping("rangeSensor") // this - idk if this works
