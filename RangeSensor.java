@@ -7,7 +7,11 @@ public AnalogInput sharp;
 sharp = new AnalogInput(port);
 
 //Create an accessor method
-public double getDistance()
+public double range = getDistance()
 {
     return (Math.pow(sharp.getAverageVoltage(), -1.2045)) * 27.726;
 }
+
+ while (opModeIsActive()) {
+       telemetry.addData("Range:", range);
+ }
