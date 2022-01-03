@@ -1,5 +1,6 @@
 import edu.wpi.first.wpilibj.AnalogInput;
 
+
 //Create the Analog Object
 public AnalogInput sharp;
 // public DeviceMapping(java.lang.Class<DEVICE_TYPE> deviceTypeClass) //not sure what device_type is
