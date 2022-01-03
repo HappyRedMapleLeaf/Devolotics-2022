@@ -6,7 +6,7 @@ public DeviceMapping(java.lang.Class<DEVICE_TYPE> deviceTypeClass) //not sure wh
 //Constuct a new instance
 // sharp = new AnalogInput(port); // still have to figure this out
 
-ranegSensor = HardwareMap.DeviceMapping<DEVICE_TYPE extends HardwareDevice>  // this - idk if this works
+rangeSensor = HardwareMap.DeviceMapping<DEVICE_TYPE extends HardwareDevice>  // this - idk if this works
 //Create an accessor method
 public double range = getDistance()
 {
