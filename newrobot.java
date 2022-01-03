@@ -47,9 +47,9 @@ public class Nenjiadumbbot extends LinearOpMode {
         armMotor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         armMotor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         
-        const int armMin = 10; //0
-        const int armMax = 370; //380
-        const int armTop = 190;
+        final int armMin = 10; //0
+        final int armMax = 370; //380
+        final int armTop = 190;
         int armFreezeTarget = 0;
         
         while (opModeIsActive()) {
