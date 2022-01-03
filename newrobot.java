@@ -47,7 +47,10 @@ public class Nenjiadumbbot extends LinearOpMode {
         armMotor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         armMotor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         // run until the end of the match (driver presses STOP)
-        
+        int armMin = 20; //0
+        int armMax = 700; //456
+        int arm1FreezeTarget = 0;
+        int arm2FreezeTarget = 0;
         while (opModeIsActive()) {
             
             if (Math.abs(gamepad1.right_stick_x) > 0.05) { //right stick is touched (some tolerance is given)
@@ -82,21 +85,64 @@ public class Nenjiadumbbot extends LinearOpMode {
             //arm movement
             int armPosition1 = armMotor1.getCurrentPosition();
             int armPosition2 = armMotor2.getCurrentPosition();
-            double armTargetPower = 0;
+            double arm1TargetPower = 0;
+            double arm2TargetPower = 0;
             
-            
-            if (gamepad1.left_bumper) {
-                armMotor1.setPower(-0.7);
-                armMotor2.setPower(-0.7);
-            } else if (gamepad1.right_bumper) {
-                armMotor1.setPower(0.7);
-                armMotor2.setPower(0.7);
+//             if (gamepad1.left_bumper) {
+//                 armMotor1.setPower(-0.7);
+//                 armMotor2.setPower(-0.7);
+//             } else if (gamepad1.right_bumper) {
+//                 armMotor1.setPower(0.7);
+//                 armMotor2.setPower(0.7);
+//             } else {
+//                 armMotor1.setPower(0);
+//                 armMotor2.setPower(0);
+//             }
+
+            if (gamepad1.left_bumper) { //down
+                armTargetPower = -0.3;
+                armFreezeTarget = -1000; //explained later
+            } else if (gamepad1.right_bumper) { //up
+                armTargetPower = 0.3;
+                armFreezeTarget = -1000;
             } else {
-                armMotor1.setPower(0);
-                armMotor2.setPower(0);
+                armTargetPower = 0;
             }
             
-                
+            if (armTargetPower > 0) { //trying to move up
+                if (armPosition > armMax) { //but too high
+                    armTargetPower = 0; //stop
+                } else if (armPosition > armMax - 100) { //almost too high
+                    armTargetPower = 0.2; //slow down
+                }
+            } else if (armTargetPower < 0) { //trying to move down
+                if (armPosition < armMin + 100) { //almost too low
+                    armTargetPower = 0; //"stopping" the motor, but really, this just drops it slowly
+                }
+            } else {
+                //kinda complex: armFreezeTarget is only set for the *first time* that targetpower is 0
+                //this is done by setting armFreezeTarget to -1000 whenever a non-zero target power is set
+                //so if the next loop comes and sees that armFreezeTarget isn't -1000, it knows not to change it
+                //because otherwise the "target" would keep moving and be useless
+                if (armFreezeTarget == -1000) {
+                    armFreezeTarget = armPosition;
+                }
+            }
+            
+            //if the preset buttons are pressed, the freeze target changes
+            if (gamepad1.a) { armFreezeTarget = 180; }
+            if (gamepad1.x) { armFreezeTarget = 290; }
+            
+            //making sure that the arm is at the freeze target
+            if (armFreezeTarget != -1000) { //it shouldn't try going to the target if a non-zero target power is set
+                if (armPosition > armFreezeTarget) {
+                    armMotor.setPower(0); //stop the arm if it's too high, and let it fall
+                } else if (armPosition < armFreezeTarget) {
+                    armMotor.setPower(0.12); //slowly raise the arm if it's too low
+                }
+            } else {
+                armMotor.setPower(armTargetPower);
+            }    
             
             // Send telemetry
             telemetry.addData("armPosition1", armPosition1);
