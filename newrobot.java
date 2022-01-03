@@ -33,7 +33,7 @@ public class Nenjiadumbbot extends LinearOpMode {
         
         //motor settings
         leftDrive.setDirection(DcMotor.Direction.REVERSE);
-        armMotor2.setDirection(DcMotor.Direction.REVERSE);
+        armMotor1.setDirection(DcMotor.Direction.REVERSE);
         
         armMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         armMotor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -46,10 +46,12 @@ public class Nenjiadumbbot extends LinearOpMode {
         armMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         armMotor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         armMotor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        // run until the end of the match (driver presses STOP)
-        int armMin = 0; //0
-        int armMax = 1000; //456
+        
+        const int armMin = 10; //0
+        const int armMax = 370; //380
+        const int armTop = 190;
         int armFreezeTarget = 0;
+        
         while (opModeIsActive()) {
             
             if (Math.abs(gamepad1.right_stick_x) > 0.05) { //right stick is touched (some tolerance is given)
@@ -89,25 +91,35 @@ public class Nenjiadumbbot extends LinearOpMode {
             
             //manual movement
             if (gamepad1.left_bumper) { //down
-                armTargetPower = -0.3;
-                armFreezeTarget = -1000; //explained later
+                armTargetPower = -0.2;
+                armFreezeTarget = -1000;
             } else if (gamepad1.right_bumper) { //up
-                armTargetPower = 0.3;
+                armTargetPower = 0.2;
                 armFreezeTarget = -1000;
             } else {
                 armTargetPower = 0;
             }
             
             if (armTargetPower > 0) { //trying to move up
-                if (armPosition > armMax) { //but too high
-                    armTargetPower = 0; //stop
-                } else if (armPosition > armMax - 100) { //almost too high
-                    armTargetPower = 0.2; //slow down
+                
+                //if the motor is close to the max, stop
+                if (armPosition > armMax - 20) {
+                    armTargetPower = 0;
+                //if the motor is close to the top, slow down
+                } else if (armPosition > armTop - 10) {
+                    armTargetPower = 0.1; //slow down
                 }
+                
             } else if (armTargetPower < 0) { //trying to move down
-                if (armPosition < armMin + 100) { //almost too low
-                    armTargetPower = 0; //"stopping" the motor, but really, this just drops it slowly
+                
+                //close to the min, stop
+                if (armPosition < armMin + 20) {
+                    armTargetPower = 0;
+                //close to the top, slow down
+                } else if (armPosition < armTop + 10) {
+                    armTargetPower = -0.1; //slow down
                 }
+                
             } else {
                 if (armFreezeTarget == -1000) {
                     armFreezeTarget = armPosition;
