@@ -47,10 +47,9 @@ public class Nenjiadumbbot extends LinearOpMode {
         armMotor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         armMotor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         // run until the end of the match (driver presses STOP)
-        int armMin = 20; //0
-        int armMax = 700; //456
-        int arm1FreezeTarget = 0;
-        int arm2FreezeTarget = 0;
+        int armMin = 0; //0
+        int armMax = 1000; //456
+        int armFreezeTarget = 0;
         while (opModeIsActive()) {
             
             if (Math.abs(gamepad1.right_stick_x) > 0.05) { //right stick is touched (some tolerance is given)
@@ -73,6 +72,7 @@ public class Nenjiadumbbot extends LinearOpMode {
             
             
             //duck motor, only need one direction
+            /*
             if ( gamepad1.dpad_left || gamepad1.dpad_right) {
                 duckMotor.setPower(-0.4);
             } else if ( gamepad1.dpad_down || gamepad1.dpad_up ){
@@ -80,34 +80,59 @@ public class Nenjiadumbbot extends LinearOpMode {
             } else {
                 duckMotor.setPower(0.0);
             }
+            */
 
             
             //arm movement
-            int armPosition1 = armMotor1.getCurrentPosition();
-            int armPosition2 = armMotor2.getCurrentPosition();
+            int armPosition = (armMotor1.getCurrentPosition() + armMotor2.getCurrentPosition()) / 2;
+            double armTargetPower = 0;
             
-            if (gamepad1.left_bumper) {
-                armMotor1.setPower(-0.7);
-                armMotor2.setPower(-0.7);
-                armMotor1.setTargetPosition(armMotor1.getCurrentPosition()-10);
-                armMotor2.setTargetPosition(armMotor2.getCurrentPosition()-10);
-                armMotor1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                armMotor2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            } else if (gamepad1.right_bumper) {
-                armMotor1.setPower(0.7);
-                armMotor2.setPower(0.7);
-                armMotor1.setTargetPosition(armMotor1.getCurrentPosition()+10);
-                armMotor2.setTargetPosition(armMotor2.getCurrentPosition()+10);
-                armMotor1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                armMotor2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            //manual movement
+            if (gamepad1.left_bumper) { //down
+                armTargetPower = -0.3;
+                armFreezeTarget = -1000; //explained later
+            } else if (gamepad1.right_bumper) { //up
+                armTargetPower = 0.3;
+                armFreezeTarget = -1000;
             } else {
-                armMotor1.setPower(0);
-                armMotor2.setPower(0);
+                armTargetPower = 0;
+            }
+            
+            if (armTargetPower > 0) { //trying to move up
+                if (armPosition > armMax) { //but too high
+                    armTargetPower = 0; //stop
+                } else if (armPosition > armMax - 100) { //almost too high
+                    armTargetPower = 0.2; //slow down
+                }
+            } else if (armTargetPower < 0) { //trying to move down
+                if (armPosition < armMin + 100) { //almost too low
+                    armTargetPower = 0; //"stopping" the motor, but really, this just drops it slowly
+                }
+            } else {
+                if (armFreezeTarget == -1000) {
+                    armFreezeTarget = armPosition;
+                }
+            }
+
+            //making sure that the arm is at the freeze target
+            if (armFreezeTarget != -1000) {
+                if (armPosition > armFreezeTarget) {
+                    //stop the arm if it's too high, and let it fall
+                    armMotor1.setPower(0);
+                    armMotor2.setPower(0);
+                } else if (armPosition < armFreezeTarget) {
+                    //slowly raise the arm if it's too low
+                    armMotor1.setPower(0.12); 
+                    armMotor2.setPower(0.12);
+                }
+            } else {
+                armMotor1.setPower(armTargetPower);
+                armMotor2.setPower(armTargetPower);
             }
             
             // Send telemetry
-            telemetry.addData("armPosition1", armPosition1);
-            telemetry.addData("armPosition2", armPosition2);
+            telemetry.addData("armPosition", armPosition);
+            telemetry.addData("freezeTarget", armFreezeTarget);
             telemetry.update();
         }
     }
