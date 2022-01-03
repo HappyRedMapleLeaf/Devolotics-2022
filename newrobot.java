@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.Range;
 
-@TeleOp(name="Bay POV", group="Devolotics")
+@TeleOp(name="Nenjia Pov", group="Devolotics")
 
 public class teleop extends LinearOpMode {
     
