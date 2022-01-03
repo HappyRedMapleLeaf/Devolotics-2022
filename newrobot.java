@@ -39,7 +39,7 @@ public class teleop extends LinearOpMode {
         
         //motor settings
         leftDrive.setDirection(DcMotor.Direction.REVERSE);
-        armMotor.setDirection(DcMotor.Direction.REVERSE);
+        armMotor2.setDirection(DcMotor.Direction.REVERSE);
         
         armMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         armMotor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
