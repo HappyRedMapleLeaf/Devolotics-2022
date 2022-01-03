@@ -12,7 +12,8 @@ public class teleop extends LinearOpMode {
     
     public DcMotor leftDrive;
     public DcMotor rightDrive;
-    public DcMotor armMotor;
+    public DcMotor armMotor1;
+    public DcMotor armMotor2;
     public DcMotor intakeMotor;
     public DcMotor duckMotor;
 
