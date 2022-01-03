@@ -47,10 +47,11 @@ public class Nenjiadumbbot extends LinearOpMode {
         armMotor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         armMotor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         
-        final int armMin = 10; //0
-        final int armMax = 370; //380
+        final int armMin = 0;
+        final int armMax = 380;
         final int armTop = 190;
         int armFreezeTarget = 0;
+        int armDirection = 0;
         
         while (opModeIsActive()) {
             
@@ -65,13 +66,14 @@ public class Nenjiadumbbot extends LinearOpMode {
             }
             
             //intake motor
-//             if (gamepad1.left_trigger > 0){
-//                 intakeMotor.setPower(0.9);
-//             } else if (gamepad1.right_trigger > 0){
-//                 intakeMotor.setPower(-0.7);
-//             }
-            //intakeMotor.setPower(gamepad1.right_trigger - gamepad1.left_trigger); //left is out, right is in
-            
+            /*
+            if (gamepad1.left_trigger > 0){
+                intakeMotor.setPower(0.9);
+            } else if (gamepad1.right_trigger > 0){
+                intakeMotor.setPower(-0.7);
+            }
+            intakeMotor.setPower(gamepad1.right_trigger - gamepad1.left_trigger); //left is out, right is in
+            */
             
             //duck motor, only need one direction
             /*
@@ -87,59 +89,49 @@ public class Nenjiadumbbot extends LinearOpMode {
             
             //arm movement
             int armPosition = (armMotor1.getCurrentPosition() + armMotor2.getCurrentPosition()) / 2;
-            double armTargetPower = 0;
             
             //manual movement
-            if (gamepad1.left_bumper) { //down
-                armTargetPower = -0.2;
-                armFreezeTarget = -1000;
-            } else if (gamepad1.right_bumper) { //up
-                armTargetPower = 0.2;
-                armFreezeTarget = -1000;
-            } else {
-                armTargetPower = 0;
-            }
-            
-            if (armTargetPower > 0) { //trying to move up
-                
-                //if the motor is close to the max, stop
-                if (armPosition > armMax - 20) {
-                    armTargetPower = 0;
-                //if the motor is close to the top, slow down
-                } else if (armPosition > armTop - 10) {
-                    armTargetPower = 0.1; //slow down
-                }
-                
-            } else if (armTargetPower < 0) { //trying to move down
-                
-                //close to the min, stop
-                if (armPosition < armMin + 20) {
-                    armTargetPower = 0;
-                //close to the top, slow down
-                } else if (armPosition < armTop + 10) {
-                    armTargetPower = -0.1; //slow down
-                }
-                
-            } else {
-                if (armFreezeTarget == -1000) {
+            if (gamepad1.left_bumper) {                 //down
+                armDirection = -1;
+            } else if (gamepad1.right_bumper) {         //up
+                armDirection = 1;
+            } else {                                    //stay in place
+                //this if block makes sure target is only set in the first cycle that direction is 0
+                if (armDirection != 0) {
                     armFreezeTarget = armPosition;
                 }
+                armDirection = 0;
             }
-
-            //making sure that the arm is at the freeze target
-            if (armFreezeTarget != -1000) {
-                if (armPosition > armFreezeTarget) {
-                    //stop the arm if it's too high, and let it fall
-                    armMotor1.setPower(0);
-                    armMotor2.setPower(0);
-                } else if (armPosition < armFreezeTarget) {
-                    //slowly raise the arm if it's too low
-                    armMotor1.setPower(0.12); 
-                    armMotor2.setPower(0.12);
-                }
-            } else {
-                armMotor1.setPower(armTargetPower);
-                armMotor2.setPower(armTargetPower);
+            
+            switch (armDirection) {
+                case 0:
+                    //gravity is dumb. if this code is too complicated blame gravity and newton and einstein.
+                    if (armPosition >= armTop) {
+                        if (armPosition >= armFreezeTarget) {
+                            armMotor1.setPower(-((armPosition - armFreezeTarget) * (armPosition - armTop)) / 36100);
+                            armMotor2.setPower(-((armPosition - armFreezeTarget) * (armPosition - armTop)) / 36100);
+                        } else {
+                            armMotor1.setPower(0);
+                            armMotor2.setPower(0);
+                        }
+                    } else {
+                        if (armPosition >= armFreezeTarget) {
+                            armMotor1.setPower(0);
+                            armMotor2.setPower(0);
+                        } else {
+                            armMotor1.setPower(((armPosition - armFreezeTarget) * (armPosition - armTop)) / 36100);
+                            armMotor2.setPower(((armPosition - armFreezeTarget) * (armPosition - armTop)) / 36100);
+                        }
+                    }
+                    break;
+                case -1:
+                    armMotor1.setPower(-0.00035 * (armMax - armPosition) + 0.10);
+                    armMotor2.setPower(-0.00035 * (armMax - armPosition) + 0.10);
+                    break;
+                case 1:
+                    armMotor1.setPower(-0.00035 * armPosition + 0.10);
+                    armMotor2.setPower(-0.00035 * armPosition + 0.10);
+                    break;
             }
             
             // Send telemetry
