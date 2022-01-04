@@ -14,7 +14,7 @@ public class Nenjiadumbbot extends LinearOpMode {
     public DcMotor rightDrive;
     public DcMotor armMotor1;
     public DcMotor armMotor2;
-//     public DcMotor duckMotor;
+    //public DcMotor duckMotor;
 
     @Override
     public void runOpMode() {
@@ -22,17 +22,17 @@ public class Nenjiadumbbot extends LinearOpMode {
         rightDrive = hardwareMap.dcMotor.get("rightDrive");
         armMotor1 = hardwareMap.dcMotor.get("armMotor1");
         armMotor2 = hardwareMap.dcMotor.get("armMotor2");
-//         duckMotor = hardwareMap.dcMotor.get("duckMotor");
+        //duckMotor = hardwareMap.dcMotor.get("duckMotor");
 
         telemetry.addData("Hello", "Bay the Gamer");
         telemetry.update();
-        // Wait for the game to start (driver presses PLAY)
+        //Wait for the game to start (driver presses PLAY)
         waitForStart();
         telemetry.addData("Status:", "Gaming");
         telemetry.update();
         
         //motor settings
-        leftDrive.setDirection(DcMotor.Direction.REVERSE);
+        rightDrive.setDirection(DcMotor.Direction.REVERSE);
         armMotor1.setDirection(DcMotor.Direction.REVERSE);
         
         armMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -91,9 +91,9 @@ public class Nenjiadumbbot extends LinearOpMode {
             int armPosition = (armMotor1.getCurrentPosition() + armMotor2.getCurrentPosition()) / 2;
             
             //manual movement
-            if (gamepad1.left_bumper) {                 //down
+            if (gamepad1.left_bumper) {             //down
                 armTarget -= armSpeed;
-            } else if (gamepad1.right_bumper) {         //up
+            } else if (gamepad1.right_bumper) {     //up
                 armTarget += armSpeed;
             }
             
