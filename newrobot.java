@@ -50,8 +50,8 @@ public class Nenjiadumbbot extends LinearOpMode {
         final int armMin = 0;
         final int armMax = 380;
         final int armTop = 190;
-        int armFreezeTarget = 0;
-        int armDirection = 0;
+        final int armSpeed = 5;
+        int armTarget = 0;
         
         while (opModeIsActive()) {
             
@@ -92,51 +92,34 @@ public class Nenjiadumbbot extends LinearOpMode {
             
             //manual movement
             if (gamepad1.left_bumper) {                 //down
-                armDirection = -1;
+                armTarget -= armSpeed;
             } else if (gamepad1.right_bumper) {         //up
-                armDirection = 1;
-            } else {                                    //stay in place
-                //this if block makes sure target is only set in the first cycle that direction is 0
-                if (armDirection != 0) {
-                    armFreezeTarget = armPosition;
-                }
-                armDirection = 0;
+                armTarget += armSpeed;
             }
             
-            switch (armDirection) {
-                case 0:
-                    //gravity is dumb. if this code is too complicated blame gravity and newton and einstein.
-                    if (armPosition >= armTop) {
-                        if (armPosition >= armFreezeTarget) {
-                            armMotor1.setPower(-((armPosition - armFreezeTarget) * (armPosition - armTop)) / 36100);
-                            armMotor2.setPower(-((armPosition - armFreezeTarget) * (armPosition - armTop)) / 36100);
-                        } else {
-                            armMotor1.setPower(0);
-                            armMotor2.setPower(0);
-                        }
-                    } else {
-                        if (armPosition >= armFreezeTarget) {
-                            armMotor1.setPower(0);
-                            armMotor2.setPower(0);
-                        } else {
-                            armMotor1.setPower(((armPosition - armFreezeTarget) * (armPosition - armTop)) / 36100);
-                            armMotor2.setPower(((armPosition - armFreezeTarget) * (armPosition - armTop)) / 36100);
-                        }
-                    }
-                    break;
-                case -1:
-                    armMotor1.setPower(-0.00035 * (armMax - armPosition) + 0.10);
-                    armMotor2.setPower(-0.00035 * (armMax - armPosition) + 0.10);
-                    break;
-                case 1:
-                    armMotor1.setPower(-0.00035 * armPosition + 0.10);
-                    armMotor2.setPower(-0.00035 * armPosition + 0.10);
-                    break;
+            //gravity is dumb. if this code is too complicated blame gravity and newton and einstein.
+            if (armPosition >= armTop) {
+                if (armPosition >= armTarget) {
+                    armMotor1.setPower(-((armPosition - armTarget) * (armPosition - armTop)) / 36100);
+                    armMotor2.setPower(-((armPosition - armTarget) * (armPosition - armTop)) / 36100);
+                } else {
+                    armMotor1.setPower(0);
+                    armMotor2.setPower(0);
+                }
+            } else {
+                if (armPosition >= armTarget) {
+                    armMotor1.setPower(0);
+                    armMotor2.setPower(0);
+                } else {
+                    armMotor1.setPower(((armPosition - armTarget) * (armPosition - armTop)) / 36100);
+                    armMotor2.setPower(((armPosition - armTarget) * (armPosition - armTop)) / 36100);
+                }
             }
+            break;
             
             // Send telemetry
             telemetry.addData("armPosition", armPosition);
-            telemetry.addData("freezeTarget", armFreezeTarget);
+            telemetry.addData("armTarget", armTarget);
             telemetry.update();
         }
     }
