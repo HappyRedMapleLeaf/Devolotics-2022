@@ -47,8 +47,8 @@ public class Nenjiadumbbot extends LinearOpMode {
         armMotor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         armMotor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         
-        final int armMin = 0;
-        final int armMax = 380;
+        final int armMin = 20; //0
+        final int armMax = 360; //380
         final int armTop = 190;
         final int armSpeed = 5;
         int armTarget = 0;
@@ -90,11 +90,12 @@ public class Nenjiadumbbot extends LinearOpMode {
             //arm movement
             int armPosition = (armMotor1.getCurrentPosition() + armMotor2.getCurrentPosition()) / 2;
             
-            //manual movement
             if (gamepad1.left_bumper) {             //down
                 armTarget -= armSpeed;
+                if (armTarget < armMin) {armTarget = armMin;}
             } else if (gamepad1.right_bumper) {     //up
                 armTarget += armSpeed;
+                if (armTarget > armMax) {armTarget = armMax;}
             }
             
             //gravity is dumb. if this code is too complicated blame gravity and newton and einstein.
