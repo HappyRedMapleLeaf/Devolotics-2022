@@ -116,7 +116,6 @@ public class Nenjiadumbbot extends LinearOpMode {
                     armMotor2.setPower(((armPosition - armTarget) * (armPosition - armTop)) / 36100);
                 }
             }
-            break;
             
             // Send telemetry
             telemetry.addData("armPosition", armPosition);
