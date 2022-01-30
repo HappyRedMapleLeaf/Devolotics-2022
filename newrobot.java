@@ -52,7 +52,6 @@ public class Nengjiabeingdumb extends LinearOpMode {
                 //turn
                 leftDrive.setPower(gamepad1.right_stick_x);
                 rightDrive.setPower(-gamepad1.right_stick_x);
-                
             } else { //right stick is untouched
                 leftDrive.setPower(-gamepad1.left_stick_y);
                 rightDrive.setPower(-gamepad1.left_stick_y);
@@ -62,7 +61,7 @@ public class Nengjiabeingdumb extends LinearOpMode {
             //intake motor
             if (gamepad1.left_trigger > 0){
                 intakeMotor.setPower(0.9);
-            } else if (gamepad1.right_trigger > 0){
+            } else if (gamepad1.right_trigger > 0) {
                 intakeMotor.setPower(-0.7);
             }
             intakeMotor.setPower(gamepad1.right_trigger - gamepad1.left_trigger); //left is out, right is in
@@ -70,7 +69,7 @@ public class Nengjiabeingdumb extends LinearOpMode {
             //duck motor, only need one direction
             if ( gamepad1.dpad_left || gamepad1.dpad_right) {
                 duckMotor.setPower(-0.4);
-            } else if ( gamepad1.dpad_down || gamepad1.dpad_up ){
+            } else if ( gamepad1.dpad_down || gamepad1.dpad_up ) {
                 duckMotor.setPower(-1.0);
             } else {
                 duckMotor.setPower(0.0);
