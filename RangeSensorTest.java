@@ -49,14 +49,14 @@ public class teleop extends LinearOpMode {
         rightDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        public double range(){
-            double sensorVoltage = rangeSensor.getVoltage();
-            return sensorVoltage;
-        }
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             
+
+            double sensorVoltage = rangeSensor.getVoltage();
+ 
+                
             if (Math.abs(gamepad1.right_stick_x) > 0.05) { //right stick is touched (some tolerance is given)
                 //turn
                 leftDrive.setPower(gamepad1.right_stick_x);
