@@ -1,5 +1,4 @@
-import edu.wpi.first.wpilibj.AnalogInput;
-
+import com.qualcomm.robotcore.hardware.AnalogInput;
 
 //Create the Analog Object
 public AnalogInput sharp;
