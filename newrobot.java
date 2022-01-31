@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-@TeleOp(name="Nengjia POV", group="Devolotics")
+@TeleOp(name="ProvsTeleop", group="Devolotics")
 
 public class Nengjiabeingdumb extends LinearOpMode {
     
@@ -32,15 +32,13 @@ public class Nengjiabeingdumb extends LinearOpMode {
 	//motor settings
 	rightDrive.setDirection(DcMotor.Direction.REVERSE);
 	armMotor.setDirection(DcMotor.Direction.REVERSE);
-
 	armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-	leftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-	rightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-	leftDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-	rightDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 	armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 	armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+	leftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+	rightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+	//leftDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+	//rightDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
 	int armMin = 0;
 	int armMax = 420;
