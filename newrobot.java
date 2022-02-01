@@ -22,7 +22,7 @@ public class Nengjiabeingdumb extends LinearOpMode {
 	rightDrive = hardwareMap.dcMotor.get("rightDrive");
 	armMotor = hardwareMap.dcMotor.get("armMotor");
 	intakeMotor = hardwareMap.dcMotor.get("intake");
-	duckMotor = hardwareMap.Servo.get("duckMotor");
+	duckMotor = hardwareMap.get(Servo.class, "duckMotor");
 
 	telemetry.addData("Hello", "Nengjia the carry");
 	telemetry.update();
@@ -68,9 +68,9 @@ public class Nengjiabeingdumb extends LinearOpMode {
 		if ( gamepad1.dpad_left || gamepad1.dpad_right) {
 		duckMotor.setPosition(0.3);
 		} else if ( gamepad1.dpad_down || gamepad1.dpad_up ) {
-		duckMotor.setPower(0.0);
+		duckMotor.setPosition(0.0);
 		} else {
-		duckMotor.setPower(0.5);
+		duckMotor.setPosition(0.5);
 		}
 
 		//arm
