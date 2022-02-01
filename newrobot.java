@@ -62,7 +62,6 @@ public class Nengjiabeingdumb extends LinearOpMode {
 		} else if (gamepad1.right_trigger > 0) {
 		intakeMotor.setPower(-0.7);
 		}
-		intakeMotor.setPower(gamepad1.right_trigger - gamepad1.left_trigger); //left is out, right is in
 
 		//duck
 		if ( gamepad1.dpad_left || gamepad1.dpad_right) {
