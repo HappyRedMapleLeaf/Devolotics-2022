@@ -4,9 +4,9 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.hardware.Servo;
 
-@Autonomous(name="Autonomous 2", group="Devolotics")
+@Autonomous(name="provsAutonomous", group="Devolotics")
 
 public class auton extends LinearOpMode {
     
@@ -14,13 +14,11 @@ public class auton extends LinearOpMode {
     public DcMotor rightDrive;
     public DcMotor armMotor;
     public DcMotor intakeMotor;
-    public DcMotor duckMotor;
+	public Servo duckMotor;
 
     // moves drive motors the specified number of ticks and does telemetry stuff
-    
-    // 1440 ticks when 60:1, somehow 720 when 40:1
-    public int ticksPerRotation = 1000;
-    
+    // 1440 ticks when 60:1, __ for 20:1 (480??)
+    public int ticksPerRotation = 480;
     public void driveToTarget(double rotationL, double rotationR, double powerL, double powerR) {
         // set targets for motors
         int targetL = Math.toIntExact(Math.round(leftDrive.getCurrentPosition() + rotationL * ticksPerRotation));
@@ -36,16 +34,8 @@ public class auton extends LinearOpMode {
         leftDrive.setPower(Math.abs(powerL));
         rightDrive.setPower(Math.abs(powerR));
         
-        // do telemetry stuff and also wait while the motors are turning
-        while (opModeIsActive() && (leftDrive.isBusy() || rightDrive.isBusy()))
-        {
-            telemetry.addData("Target",  "Running to %7d :%7d", (leftDrive.getCurrentPosition() + targetL),  (rightDrive.getCurrentPosition() + targetR));
-            telemetry.addData("Position",  "Running at %7d :%7d",
-                                        leftDrive.getCurrentPosition(),
-                                        rightDrive.getCurrentPosition());
-            telemetry.update();
-            idle();
-        }
+        // wait while the motors are turning
+        while (opModeIsActive() && (leftDrive.isBusy() || rightDrive.isBusy())) {}
         
         // stops the motor
         leftDrive.setPower(0.0);
@@ -63,27 +53,22 @@ public class auton extends LinearOpMode {
         rightDrive = hardwareMap.dcMotor.get("rightDrive");
         armMotor = hardwareMap.dcMotor.get("armMotor");
         intakeMotor = hardwareMap.dcMotor.get("intake");
-        duckMotor = hardwareMap.dcMotor.get("duckMotor");
+	    duckMotor = hardwareMap.get(Servo.class, "duckMotor");
         
         //motor settings
         leftDrive.setDirection(DcMotor.Direction.REVERSE);
-        leftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         
-        // start sequence
-        telemetry.addData("Status:", "Waiting for start");
+        telemetry.addData("Hello", "Driver");
         telemetry.update();
-        waitForStart();
-        telemetry.addData("Status", "Running");
-        telemetry.update();
-        
+	    waitForStart();
+	    telemetry.addData("Status:", "Gaming");
+	    telemetry.update();
         
         // actual program. Intial position: halfway between first and second ground tile
         driveToTarget(0.76, 0.56, 1.0, 0.4); //forwards to carousel, turn a bit because duck wheel will hit the metal thingy
-        
         
         // carousel
         duckMotor.setPower(-0.5);
@@ -133,5 +118,7 @@ public class auton extends LinearOpMode {
         intakeMotor.setPower(-0.9);
         sleep(1000);
         intakeMotor.setPower(0.0);
+        
+        //test: put another freight in
     }
 }
