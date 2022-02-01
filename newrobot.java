@@ -60,7 +60,7 @@ public class Nengjiabeingdumb extends LinearOpMode {
 		} else if (gamepad1.right_trigger > 0) {
 			intakeMotor.setPower(-0.7);
 		} else {
-			intakeMotor.setPower(-0.7);
+			intakeMotor.setPower(0);
 		}
 
 		//duck
