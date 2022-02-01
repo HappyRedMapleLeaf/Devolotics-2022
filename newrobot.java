@@ -24,10 +24,10 @@ public class Nengjiabeingdumb extends LinearOpMode {
 	intakeMotor = hardwareMap.dcMotor.get("intake");
 	duckMotor = hardwareMap.get(Servo.class, "duckMotor");
 
-	telemetry.addData("Hello", "Nengjia the carry");
+	telemetry.addData("Hello", "Driver");
 	telemetry.update();
 	waitForStart();
-	telemetry.addData("Status:", "Getting assasinated by robot");
+	telemetry.addData("Status:", "Gaming");
 	telemetry.update();
 
 	//motor settings
@@ -38,8 +38,6 @@ public class Nengjiabeingdumb extends LinearOpMode {
 	armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 	leftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 	rightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-	//leftDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-	//rightDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
 	int armMin = 0;
 	int armMax = 420;
