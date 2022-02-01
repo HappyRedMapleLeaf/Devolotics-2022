@@ -50,24 +50,26 @@ public class Nengjiabeingdumb extends LinearOpMode {
 			leftDrive.setPower(gamepad1.right_stick_x);
 			rightDrive.setPower(-gamepad1.right_stick_x);
 		} else { //right stick is untouched
-		leftDrive.setPower(-gamepad1.left_stick_y);
-		rightDrive.setPower(-gamepad1.left_stick_y);
+			leftDrive.setPower(-gamepad1.left_stick_y);
+			rightDrive.setPower(-gamepad1.left_stick_y);
 		}
 
 		//intake
 		if (gamepad1.left_trigger > 0){
-		intakeMotor.setPower(0.9);
+			intakeMotor.setPower(0.9);
 		} else if (gamepad1.right_trigger > 0) {
-		intakeMotor.setPower(-0.7);
+			intakeMotor.setPower(-0.7);
+		} else {
+			intakeMotor.setPower(-0.7);
 		}
 
 		//duck
 		if ( gamepad1.dpad_left || gamepad1.dpad_right) {
-		duckMotor.setPosition(0.3);
+			duckMotor.setPosition(0.3);
 		} else if ( gamepad1.dpad_down || gamepad1.dpad_up ) {
-		duckMotor.setPosition(0.0);
+			duckMotor.setPosition(0.0);
 		} else {
-		duckMotor.setPosition(0.5);
+			duckMotor.setPosition(0.5);
 		}
 
 		//arm
