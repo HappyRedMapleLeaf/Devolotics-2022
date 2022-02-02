@@ -57,6 +57,7 @@ public class auton extends LinearOpMode {
 
 		//motor settings
 		rightDrive.setDirection(DcMotor.Direction.REVERSE);
+		armMotor.setDirection(DcMotor.Direction.REVERSE);
 		armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 		leftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 		rightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -77,25 +78,24 @@ public class auton extends LinearOpMode {
 
 
 		driveToTarget(-0.9, -0.83, 0.5, 0.4); //back to initial position
-
 		driveToTarget(-2.51, -2.58, 1.0, 1.0); //backwards to around the middle
-
 		driveToTarget(1.04, -1.04, 0.5, 0.5); //turn towards hub
-
+		
+		//squaring to hub, measured in time because distance to hub is unknown
 		leftDrive.setPower(-0.5);
 		rightDrive.setPower(-0.5);
-		sleep(900);//2000
+		sleep(900);
 		leftDrive.setPower(0);
 		rightDrive.setPower(0);
 
 		driveToTarget(1.25, 1.25, 0.7, 0.7); //go towards hub
 
-		// lift arm (i know, it could be done at the same time with driving, but a) lazy, and b) we have extra time for sure)
-		armMotor.setPower(-0.5);
+		// lift arm
+		armMotor.setPower(0.5);
 		//sleep(200); //level 1
 		sleep(450); //level 2
 		//sleep(700); //level 3
-		armMotor.setPower(-0.1); //too lazy to do encoder stuff, so im just gonna uhm... apply a little power and hope it keeps it up lol
+		armMotor.setPower(0.12); //keep arm up
 
 		driveToTarget(0.31, 0.31, 0.2, 0.2); //go towards hub even more
 
@@ -113,12 +113,30 @@ public class auton extends LinearOpMode {
 
 		driveToTarget(2.01, -0.03, 0.5, 0.1); //turn towards warehouse
 
-		driveToTarget(4, 4, 0.81, 0.8); //go into warehouse
+		driveToTarget(4, 4, 1.0, 0.98); //go into warehouse
 
 		intakeMotor.setPower(-0.9);
+		sleep(1500);
+		intakeMotor.setPower(0.0);
+		
+		//END OF OLD AUTONOMOUS CODE. BELOW IS EXPERIMENTAL.
+		driveToTarget(-3, -3, 1.0, 0.98); //move out of warehouse, idk numbers here
+		driveToTarget(-2.01, 0.03, 0.5, 0.1); //turn towards hub
+		
+		//move towards hub and raise arm, drop freight
+		armMotor.setPower(0.5);
+		sleep(200); //level 1 (widest and worth same points in auton, i think)
+		armMotor.setPower(0.12); //keep arm up
+		driveToTarget(0.31, 0.31, 0.2, 0.2); //go towards hub even more
+		intakeMotor.setPower(0.7);
 		sleep(1000);
 		intakeMotor.setPower(0.0);
 
-		//test: put another freight in
+		//lower arm and go back to warehouse
+		driveToTarget(-0.28, -0.28, 0.2, 0.2); //away from hub
+		armMotor.setPower(0.0);
+		driveToTarget(-1.6, -1.6, 1.0, 1.0); //go to wall, then a bit more to square with wall
+		driveToTarget(2.01, -0.03, 0.5, 0.1); //turn towards warehouse
+		driveToTarget(4, 4, 0.81, 0.8); //go into warehouse
 	}
 }
