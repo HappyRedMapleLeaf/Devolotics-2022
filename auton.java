@@ -121,18 +121,18 @@ public class auton extends LinearOpMode {
 		
 		//END OF OLD AUTONOMOUS CODE. BELOW IS EXPERIMENTAL.
 		driveToTarget(-3, -3, 1.0, 0.98); //move out of warehouse, idk numbers here
-		driveToTarget(-2.01, 0.03, 0.5, 0.1); //turn towards hub
+		driveToTarget(-2.05, -0.05, 0.5, 0.1); //turn towards hub, also squaring
 		
 		//move towards hub and raise arm, drop freight
 		armMotor.setPower(0.5);
-		sleep(200); //level 1 (widest and worth same points in auton, i think)
+		sleep(200); //level 1 (widest)
 		armMotor.setPower(0.12); //keep arm up
 		driveToTarget(0.31, 0.31, 0.2, 0.2); //go towards hub even more
-		intakeMotor.setPower(0.7);
+		intakeMotor.setPower(0.7); //release freight
 		sleep(1000);
 		intakeMotor.setPower(0.0);
 
-		//lower arm and go back to warehouse
+		//lower arm and go back to warehouse. this is a paste of above
 		driveToTarget(-0.28, -0.28, 0.2, 0.2); //away from hub
 		armMotor.setPower(0.0);
 		driveToTarget(-1.6, -1.6, 1.0, 1.0); //go to wall, then a bit more to square with wall
